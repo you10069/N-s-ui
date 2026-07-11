@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"path/filepath"
 )
 
 //go:embed version
@@ -53,6 +54,12 @@ func GetBinFolderPath() string {
 	if binFolderPath == "" {
 		binFolderPath = "bin"
 	}
+
+	absolutePath, err := filepath.Abs(binFolderPath)
+	if err == nil {
+		return absolutePath
+	}
+
 	return binFolderPath
 }
 
