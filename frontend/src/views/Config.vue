@@ -176,13 +176,13 @@ const loadRuntimeConfig = async () => {
 
 const checkConfig = async () => {
   checking.value = true
-  await HttpUtils.post('api/checkConfigText', { content: content.value })
+  await HttpUtils.postJSON('api/checkConfigText', { content: content.value })
   checking.value = false
 }
 
 const saveConfig = async () => {
   saving.value = true
-  const msg = await HttpUtils.post('api/saveConfigText', { content: content.value })
+  const msg = await HttpUtils.postJSON('api/saveConfigText', { content: content.value })
   saving.value = false
   if (msg.success) {
     baseline.value = content.value

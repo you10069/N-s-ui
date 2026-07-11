@@ -286,7 +286,7 @@ stop() {
     else
         systemctl stop $1
         sleep 2
-        check_status
+        check_status "$1"
         if [[ $? == 1 ]]; then
             LOGI "${1} stopped successfully"
         else

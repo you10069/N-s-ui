@@ -307,7 +307,7 @@ const saveMetadata = async () => {
   editor.value.saving = true
   const expiry = editor.value.expiryLocal ? Math.floor(new Date(editor.value.expiryLocal).getTime() / 1000) : 0
   const volume = Math.max(0, Math.round((Number(editor.value.volumeGB) || 0) * GIB))
-  const msg = await HttpUtils.post('api/updateClient', {
+  const msg = await HttpUtils.postJSON('api/updateClient', {
     id: editor.value.data.id,
     enable: Boolean(editor.value.data.enable),
     volume,
@@ -325,7 +325,7 @@ const saveMetadata = async () => {
 
 const resetTraffic = async (item: ManagedClient) => {
   if (!window.confirm(i18n.global.t('client.resetConfirm'))) return
-  const msg = await HttpUtils.post('api/resetClientTraffic', { id: item.id })
+  const msg = await HttpUtils.postJSON('api/resetClientTraffic', { id: item.id })
   if (msg.success) {
     await loadClients()
     if (editor.value.visible && editor.value.data.id === item.id) {
