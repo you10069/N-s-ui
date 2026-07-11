@@ -1,0 +1,39 @@
+package cronjob
+
+import (
+	"time"
+
+	"github.com/robfig/cron/v3"
+)
+
+type CronJob struct {
+	cron *cron.Cron
+}
+
+func NewCronJob() *CronJob {
+	return &CronJob{}
+}
+
+func (c *CronJob) Start(loc *time.Location, trafficAge int) error {
+	c.cron = cron.New(cron.WithLocation(loc), cron.WithSeconds())
+	c.cron.Start()
+
+	go func() {
+		// Start stats job
+		c.cron.AddJob("@every 10s", NewStatsJob())
+		// Enforce expiry, quota and manual user restrictions.
+		c.cron.AddJob("@every 30s", NewClientLimitJob())
+		// Reset client counters according to each user's monthly reset day.
+		c.cron.AddJob("0 5 * * * *", NewClientResetJob(loc))
+		// Start deleting old stats
+		c.cron.AddJob("@daily", NewDelStatsJob(trafficAge))
+	}()
+
+	return nil
+}
+
+func (c *CronJob) Stop() {
+	if c.cron != nil {
+		c.cron.Stop()
+	}
+}

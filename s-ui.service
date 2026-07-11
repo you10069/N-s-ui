@@ -1,0 +1,15 @@
+[Unit]
+Description=s-ui Service
+After=network.target
+Wants=network.target
+Before=sing-box.service
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/s-ui/
+ExecStart=/usr/local/s-ui/sui
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
