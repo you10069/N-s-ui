@@ -52,6 +52,8 @@ export default {
     gauge: {
       cpu: "Загрузка ЦП",
       mem: "Загрузка ОЗУ",
+      disk: "DISK",
+      swap: "SWAP",
     },
     chart: {
       cpu: "Мониторинг ЦП",
@@ -68,7 +70,8 @@ export default {
       uptime: "Время работы",
       threads: "Потоки",
       memory: "Память",
-      running: "Работает"
+      running: "Работает",
+      showIp: "Всегда показывать IP"
     }
   },
   objects: {

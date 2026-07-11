@@ -1,18 +1,34 @@
 <script lang="ts" setup>
-import { HumanReadable } from '@/plugins/utils';
-import { computed } from 'vue';
+import { i18n } from '@/locales'
+import { computed } from 'vue'
 
 const props = defineProps({
   tilesData: <any>{},
   type: String
 })
 
-const data = computed(() => {
+type GaugeData = {
+  percent: number
+  text: string
+  percentage: string
+}
+
+const clampPercent = (value: number) => {
+  if (!Number.isFinite(value)) return 0
+  return Math.min(100, Math.max(0, value))
+}
+
+const data = computed<GaugeData>(() => {
   const d = props.tilesData
-  if (!d.mem && !d.cpu && !d.disk && !d.swap) return { percent: 0, text: '-' }
+  if (!d.mem && !d.cpu && !d.disk && !d.swap) {
+    return { percent: 0, text: '-', percentage: '' }
+  }
+
   switch (props.type) {
-    case 'g-cpu':
-      return { percent: d.cpu, text: Math.ceil(d.cpu) + "%" }
+    case 'g-cpu': {
+      const percent = clampPercent(Number(d.cpu) || 0)
+      return { percent, text: `${percent.toFixed(2)}%`, percentage: '' }
+    }
     case 'g-mem':
       return usageGauge(d.mem)
     case 'g-disk':
@@ -20,24 +36,41 @@ const data = computed(() => {
     case 'g-swap':
       return usageGauge(d.swap)
   }
-  return { percent: 0, text: '-'}
+
+  return { percent: 0, text: '-', percentage: '' }
 })
 
-const usageGauge = (usage: any) => {
-  if (!usage || !usage.total) return { percent: 0, text: '-' }
-  const curr = HumanReadable.sizeFormat(usage.current, 0).split(' ')
-  const total = HumanReadable.sizeFormat(usage.total, 0).split(' ')
-  if (curr[1] == total[1]) curr[1] = ''
+const sizeUnits = [
+  { divisor: 1024 ** 5, key: 'PB' },
+  { divisor: 1024 ** 4, key: 'TB' },
+  { divisor: 1024 ** 3, key: 'GB' },
+  { divisor: 1024 ** 2, key: 'MB' },
+  { divisor: 1024, key: 'KB' },
+  { divisor: 1, key: 'B' },
+]
+
+const formatUsage = (current: number, total: number) => {
+  const unit = sizeUnits.find(item => total >= item.divisor) ?? sizeUnits[sizeUnits.length - 1]
+  const unitName = i18n.global.t(`stats.${unit.key}`)
+  return `${(current / unit.divisor).toFixed(2)} / ${(total / unit.divisor).toFixed(2)} ${unitName}`
+}
+
+const usageGauge = (usage: any): GaugeData => {
+  const current = Number(usage?.current) || 0
+  const total = Number(usage?.total) || 0
+  if (total <= 0) return { percent: 0, text: '-', percentage: '0.00%' }
+
+  const percent = clampPercent(current * 100 / total)
   return {
-    percent: Math.ceil(usage.current * 100 / usage.total),
-    text: curr[0] + "<sup>" + (curr[1] ?? ' ') + "</sup>/" + total[0] + "<sup>" + (total[1] ?? '') + "</sup>"
+    percent,
+    text: formatUsage(current, total),
+    percentage: `${percent.toFixed(2)}%`,
   }
 }
 
 const cssTransformRotateValue = computed(() => {
   const percentageAsFraction = data.value.percent / 100
   const halfPercentage = percentageAsFraction / 2
-
   return `${halfPercentage}turn`
 })
 
@@ -52,13 +85,20 @@ const gaugeColor = computed(() => {
   <div class="gauge__outer">
     <div class="gauge__inner">
       <div
-        class="gauge__fill" 
-        :style="{ 
+        class="gauge__fill"
+        :style="{
           transform: `rotate(${cssTransformRotateValue})`,
           background: `rgb(var(--v-theme-${gaugeColor}))`
-          }">
+        }"
+      ></div>
+      <div class="gauge__cover">
+        <span class="gauge__value" :class="{ 'gauge__value--compact': data.percentage }" dir="ltr">
+          {{ data.text }}
+        </span>
+        <span v-if="data.percentage" class="gauge__percentage" dir="ltr">
+          {{ data.percentage }}
+        </span>
       </div>
-      <div class="gauge__cover"><span dir="ltr" v-html="data.text"></span></div>
     </div>
   </div>
 </template>
@@ -101,19 +141,29 @@ const gaugeColor = computed(() => {
   left: 50%;
   transform: translateX(-50%);
   border-radius: 50%;
-
-  /* Text */
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding-bottom: 25%;
+  padding: 0 8px 25%;
   box-sizing: border-box;
   font-family: 'Lexend', sans-serif;
   font-weight: bold;
-  font-size: 32px;
+  font-size: 30px;
+  line-height: 1.15;
+  text-align: center;
 }
 
-sup {
-  font-size: 16px;
+.gauge__value {
+  white-space: nowrap;
+}
+
+.gauge__value--compact {
+  font-size: 17px;
+}
+
+.gauge__percentage {
+  margin-top: 4px;
+  font-size: 18px;
 }
 </style>

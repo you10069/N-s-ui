@@ -53,6 +53,8 @@ export default {
     gauge: {
       cpu: "CPU 儀表",
       mem: "RAM 儀表",
+      disk: "DISK 儀表",
+      swap: "SWAP 儀表",
     },
     chart: {
       cpu: "CPU 監視器",
@@ -69,7 +71,8 @@ export default {
       uptime: "運行時間",
       threads: "線程",
       memory: "內存",
-      running: "運行狀態"
+      running: "運行狀態",
+      showIp: "持續顯示 IP"
     }
   },
   objects: {

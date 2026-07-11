@@ -53,7 +53,7 @@ export default {
     gauge: {
       cpu: "CPU 仪表",
       mem: "RAM 仪表",
-      disk: "磁盘仪表",
+      disk: "DISK 仪表",
       swap: "SWAP 仪表",
     },
     chart: {
@@ -71,7 +71,8 @@ export default {
       uptime: "运行时间",
       threads: "线程",
       memory: "内存",
-      running: "运行状态"
+      running: "运行状态",
+      showIp: "持续显示 IP"
     }
   },
   configEditor: {

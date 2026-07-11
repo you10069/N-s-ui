@@ -52,6 +52,8 @@ export default {
     gauge: {
       cpu: "سنجش پردازنده",
       mem: "سنجش حافظه",
+      disk: "سنجش DISK",
+      swap: "سنجش SWAP",
     },
     chart: {
       cpu: "نمودار پردازنده",
@@ -68,7 +70,8 @@ export default {
       uptime: "مدت‌",
       threads: "نخ‌ها",
       memory: "حافظه",
-      running: "اجرا"
+      running: "اجرا",
+      showIp: "نمایش دائمی IP"
     }
   },
   objects: {

@@ -51,8 +51,13 @@
       </v-row>
       <v-row>
         <v-col cols="12" sm="6" md="3" v-for="i in reloadItems" :key="i">
-          <v-card class="rounded-lg" variant="outlined" height="210px"
-                  :title="menuItems.flatMap(cat => cat.value).find(m => m.value == i)?.title">
+          <v-card
+            class="rounded-lg"
+            variant="outlined"
+            :height="i == 'i-sys' && showSystemIp ? 'auto' : '210px'"
+            min-height="210px"
+            :title="menuItems.flatMap(cat => cat.value).find(m => m.value == i)?.title"
+          >
             <v-card-text style="padding: 0 16px;" align="center" justify="center">
               <Gauge :tilesData="tilesData" :type="i" v-if="i.charAt(0) == 'g'" />
               <History :tilesData="tilesData" :type="i" v-if="i.charAt(0) == 'h'" />
@@ -71,18 +76,45 @@
                   </v-col>
                   <v-col cols="3">IP</v-col>
                   <v-col cols="9">
-                    <v-chip density="compact" color="primary" variant="flat" v-if="tilesData.sys?.ipv4?.length>0">
-                      <v-tooltip activator="parent" location="top" style="direction: ltr;">
-                        <span v-html="tilesData.sys?.ipv4?.join('<br />')"></span>
-                      </v-tooltip>
-                      IPv4
-                    </v-chip>
-                    <v-chip density="compact" color="primary" variant="flat" v-if="tilesData.sys?.ipv6?.length>0">
-                      <v-tooltip activator="parent" location="top" style="direction: ltr;">
-                        <span v-html="tilesData.sys?.ipv6?.join('<br />')"></span>
-                      </v-tooltip>
-                      IPv6
-                    </v-chip>
+                    <div class="d-flex align-center flex-wrap ga-1">
+                      <v-chip density="compact" color="primary" variant="flat" v-if="tilesData.sys?.ipv4?.length>0">
+                        <v-tooltip activator="parent" location="top" style="direction: ltr;">
+                          <span v-html="tilesData.sys?.ipv4?.join('<br />')"></span>
+                        </v-tooltip>
+                        IPv4
+                      </v-chip>
+                      <v-chip density="compact" color="primary" variant="flat" v-if="tilesData.sys?.ipv6?.length>0">
+                        <v-tooltip activator="parent" location="top" style="direction: ltr;">
+                          <span v-html="tilesData.sys?.ipv6?.join('<br />')"></span>
+                        </v-tooltip>
+                        IPv6
+                      </v-chip>
+                      <v-switch
+                        v-model="showSystemIp"
+                        class="ip-visibility-switch"
+                        color="primary"
+                        density="compact"
+                        hide-details
+                        inset
+                        :label="$t('main.info.showIp')"
+                      ></v-switch>
+                    </div>
+                    <v-expand-transition>
+                      <div v-if="showSystemIp" class="ip-address-list mt-2" dir="ltr">
+                        <div v-if="tilesData.sys?.ipv4?.length>0" class="ip-address-group">
+                          <span class="ip-address-label">IPv4</span>
+                          <span v-for="address in tilesData.sys.ipv4" :key="`ipv4-${address}`" class="ip-address">
+                            {{ address }}
+                          </span>
+                        </div>
+                        <div v-if="tilesData.sys?.ipv6?.length>0" class="ip-address-group">
+                          <span class="ip-address-label">IPv6</span>
+                          <span v-for="address in tilesData.sys.ipv6" :key="`ipv6-${address}`" class="ip-address">
+                            {{ address }}
+                          </span>
+                        </div>
+                      </div>
+                    </v-expand-transition>
                   </v-col>
                   <v-col cols="3">S-UI</v-col>
                   <v-col cols="9">
@@ -170,12 +202,17 @@ import { HumanReadable } from '@/plugins/utils'
 import Data from '@/store/modules/data'
 import Gauge from '@/components/tiles/Gauge.vue'
 import History from '@/components/tiles/History.vue'
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { i18n } from '@/locales'
 import LogVue from '@/layouts/modals/Logs.vue'
 
 const loading = ref(false)
 const menu = ref(false)
+const showSystemIp = ref(localStorage.getItem('showSystemIp') === 'true')
+
+watch(showSystemIp, value => {
+  localStorage.setItem('showSystemIp', String(value))
+})
 const menuItems = [
   { title: i18n.global.t('main.gauges'), value: [
     { title: i18n.global.t('main.gauge.cpu'), value: "g-cpu" },
@@ -265,3 +302,38 @@ const restartSingbox = async () => {
   loading.value = false
 }
 </script>
+
+<style scoped>
+.ip-visibility-switch {
+  flex: 0 0 auto;
+  min-width: 118px;
+}
+
+.ip-address-list {
+  max-height: 150px;
+  overflow-y: auto;
+  padding: 8px 10px;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 8px;
+  background: rgba(var(--v-theme-surface-variant), 0.35);
+  text-align: left;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.ip-address-group + .ip-address-group {
+  margin-top: 8px;
+}
+
+.ip-address-label {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 700;
+}
+
+.ip-address {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+</style>

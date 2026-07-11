@@ -52,6 +52,8 @@ export default {
     gauge: {
       cpu: "Đồng hồ CPU",
       mem: "Đồng hồ RAM",
+      disk: "Đồng hồ DISK",
+      swap: "Đồng hồ SWAP",
     },
     chart: {
       cpu: "Máy theo dõi CPU",
@@ -68,7 +70,8 @@ export default {
       uptime: "Thời gian hoạt động",
       threads: "Luồng",
       memory: "Bộ nhớ",
-      running: "Đang chạy"
+      running: "Đang chạy",
+      showIp: "Luôn hiển thị IP"
     }
   },
   objects: {

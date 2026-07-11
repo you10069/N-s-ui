@@ -53,7 +53,7 @@ export default {
     gauge: {
       cpu: "CPU Gauge",
       mem: "RAM Gauge",
-      disk: "Disk Gauge",
+      disk: "DISK Gauge",
       swap: "Swap Gauge",
     },
     chart: {
@@ -71,7 +71,8 @@ export default {
       uptime: "Uptime",
       threads: "Threads",
       memory: "Memory",
-      running: "Running"
+      running: "Running",
+      showIp: "Always show IP"
     }
   },
   configEditor: {
