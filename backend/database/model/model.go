@@ -36,7 +36,6 @@ type Client struct {
 	Name          string          `json:"name" form:"name" gorm:"index"`
 	Config        json.RawMessage `json:"config" form:"config"`
 	Inbounds      json.RawMessage `json:"inbounds" form:"inbounds"`
-	Links         json.RawMessage `json:"links" form:"links"`
 	Volume        int64           `json:"volume" form:"volume"`
 	Expiry        int64           `json:"expiry" form:"expiry"`
 	Down          int64           `json:"down" form:"down"`

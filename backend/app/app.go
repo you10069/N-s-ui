@@ -7,7 +7,6 @@ import (
 	"s-ui/database"
 	"s-ui/logger"
 	"s-ui/service"
-	"s-ui/sub"
 	"s-ui/web"
 
 	"github.com/op/go-logging"
@@ -16,7 +15,6 @@ import (
 type APP struct {
 	service.SettingService
 	webServer *web.Server
-	subServer *sub.Server
 	cronJob   *cronjob.CronJob
 }
 
@@ -36,7 +34,6 @@ func (a *APP) Init() error {
 
 	a.cronJob = cronjob.NewCronJob()
 	a.webServer = web.NewServer()
-	a.subServer = sub.NewServer()
 
 	configService := service.NewConfigService()
 	err = configService.InitConfig()
@@ -62,27 +59,12 @@ func (a *APP) Start() error {
 		return err
 	}
 
-	err = a.webServer.Start()
-	if err != nil {
-		return err
-	}
-
-	err = a.subServer.Start()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return a.webServer.Start()
 }
 
 func (a *APP) Stop() {
 	a.cronJob.Stop()
-	err := a.subServer.Stop()
-	if err != nil {
-		logger.Warning("stop Sub Server err:", err)
-	}
-	err = a.webServer.Stop()
-	if err != nil {
+	if err := a.webServer.Stop(); err != nil {
 		logger.Warning("stop Web Server err:", err)
 	}
 }

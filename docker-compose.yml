@@ -16,7 +16,6 @@ services:
     restart: unless-stopped
     ports:
       - "2095:2095"
-      - "2096:2096"
     networks:
       - s-ui
     links:

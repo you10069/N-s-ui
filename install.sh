@@ -130,19 +130,12 @@ config_after_install() {
         echo -e "Enter the ${yellow}panel path${plain} (leave blank for existing/default value):"
         read config_path
 
-        # Sub configuration
-        echo -e "Enter the ${yellow}subscription port${plain} (leave blank for existing/default value):"
-        read config_subPort
-        echo -e "Enter the ${yellow}subscription path${plain} (leave blank for existing/default value):" 
-        read config_subPath
 
         # Set configs
         echo -e "${yellow}Initializing, please wait...${plain}"
         params=""
         [ -z "$config_port" ] || params="$params -port $config_port"
         [ -z "$config_path" ] || params="$params -path $config_path"
-        [ -z "$config_subPort" ] || params="$params -subPort $config_subPort"
-        [ -z "$config_subPath" ] || params="$params -subPath $config_subPath"
         /usr/local/s-ui/sui setting ${params}
 
         read -p "Do you want to change admin credentials [y/n]? ": admin_confirm

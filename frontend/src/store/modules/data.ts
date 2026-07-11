@@ -8,7 +8,6 @@ const Data = defineStore('Data', {
   state: () => ({ 
     lastLoad: 0,
     reloadItems: localStorage.getItem("reloadItems")?.split(',') ?? <string[]>["g-cpu", "g-mem", "g-disk", "g-swap", "i-sys", "i-sbd"],
-    subURI: "",
     onlines: {inbound: <string[]>[], outbound: <string[]>[], user: <string[]>[]},
     oldData: <{config: any, clients: any[], tlsConfigs: any[], inData: any[]}>{},
     config: <any>{},
@@ -39,7 +38,6 @@ const Data = defineStore('Data', {
         if (msg.obj.config) {
           // To avoid ref copy
           const data = JSON.parse(JSON.stringify(msg.obj))
-          if (data.subURI) this.subURI = data.subURI
           if (data.config) this.config = data.config
           if (data.clients) this.clients = data.clients
           if (data.tls) this.tlsConfigs = data.tls

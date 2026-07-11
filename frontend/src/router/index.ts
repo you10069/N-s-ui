@@ -31,8 +31,7 @@ const routes = [
       },
       {
         path: '/admins',
-        name: 'pages.admins',
-        component: () => import('@/views/Admins.vue'),
+        redirect: '/settings?tab=admin',
       },
       {
         path: '/settings',

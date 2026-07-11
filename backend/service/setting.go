@@ -26,17 +26,23 @@ var defaultValueMap = map[string]string{
 	"sessionMaxAge": "0",
 	"trafficAge":    "30",
 	"timeLocation":  "Asia/Tehran",
-	"subListen":     "",
-	"subPort":       "2096",
-	"subPath":       "/sub/",
-	"subDomain":     "",
-	"subCertFile":   "",
-	"subKeyFile":    "",
-	"subUpdates":    "12",
-	"subEncode":     "true",
-	"subShowInfo":   "false",
-	"subURI":        "",
-	"subJsonExt":    "",
+}
+
+// These keys belonged to the removed subscription and JSON-subscription
+// servers. They are deleted from existing databases during the next settings
+// read so upgrades do not retain dead configuration.
+var obsoleteSettingKeys = []string{
+	"subListen",
+	"subPort",
+	"subPath",
+	"subDomain",
+	"subCertFile",
+	"subKeyFile",
+	"subUpdates",
+	"subEncode",
+	"subShowInfo",
+	"subURI",
+	"subJsonExt",
 }
 
 type SettingService struct {
@@ -44,9 +50,12 @@ type SettingService struct {
 
 func (s *SettingService) GetAllSetting() (*map[string]string, error) {
 	db := database.GetDB()
+	if err := db.Where("key IN ?", obsoleteSettingKeys).Delete(&model.Setting{}).Error; err != nil {
+		return nil, err
+	}
+
 	settings := make([]*model.Setting, 0)
-	err := db.Model(model.Setting{}).Find(&settings).Error
-	if err != nil {
+	if err := db.Model(model.Setting{}).Find(&settings).Error; err != nil {
 		return nil, err
 	}
 	allSetting := map[string]string{}
@@ -57,15 +66,14 @@ func (s *SettingService) GetAllSetting() (*map[string]string, error) {
 
 	for key, defaultValue := range defaultValueMap {
 		if _, exists := allSetting[key]; !exists {
-			err = s.saveSetting(key, defaultValue)
-			if err != nil {
+			if err := s.saveSetting(key, defaultValue); err != nil {
 				return nil, err
 			}
 			allSetting[key] = defaultValue
 		}
 	}
 
-	// Due to security principles
+	// Never expose the session signing secret through the web API.
 	delete(allSetting, "secret")
 
 	return &allSetting, nil
@@ -120,18 +128,6 @@ func (s *SettingService) setString(key string, value string) error {
 	return s.saveSetting(key, value)
 }
 
-func (s *SettingService) getBool(key string) (bool, error) {
-	str, err := s.getString(key)
-	if err != nil {
-		return false, err
-	}
-	return strconv.ParseBool(str)
-}
-
-// func (s *SettingService) setBool(key string, value bool) error {
-// 	return s.setString(key, strconv.FormatBool(value))
-// }
-
 func (s *SettingService) getInt(key string) (int, error) {
 	str, err := s.getString(key)
 	if err != nil {
@@ -143,6 +139,7 @@ func (s *SettingService) getInt(key string) (int, error) {
 func (s *SettingService) setInt(key string, value int) error {
 	return s.setString(key, strconv.Itoa(value))
 }
+
 func (s *SettingService) GetListen() (string, error) {
 	return s.getString("webListen")
 }
@@ -194,9 +191,8 @@ func (s *SettingService) SetWebPath(webPath string) error {
 func (s *SettingService) GetSecret() ([]byte, error) {
 	secret, err := s.getString("secret")
 	if secret == defaultValueMap["secret"] {
-		err := s.saveSetting("secret", secret)
-		if err != nil {
-			logger.Warning("save secret failed:", err)
+		if saveErr := s.saveSetting("secret", secret); saveErr != nil {
+			logger.Warning("save secret failed:", saveErr)
 		}
 	}
 	return []byte(secret), err
@@ -211,145 +207,51 @@ func (s *SettingService) GetTrafficAge() (int, error) {
 }
 
 func (s *SettingService) GetTimeLocation() (*time.Location, error) {
-	l, err := s.getString("timeLocation")
+	locationName, err := s.getString("timeLocation")
 	if err != nil {
 		return nil, err
 	}
-	location, err := time.LoadLocation(l)
+	location, err := time.LoadLocation(locationName)
 	if err != nil {
 		defaultLocation := defaultValueMap["timeLocation"]
-		logger.Errorf("location <%v> not exist, using default location: %v", l, defaultLocation)
+		logger.Errorf("location <%v> not exist, using default location: %v", locationName, defaultLocation)
 		return time.LoadLocation(defaultLocation)
 	}
 	return location, nil
 }
 
-func (s *SettingService) GetSubListen() (string, error) {
-	return s.getString("subListen")
-}
-
-func (s *SettingService) GetSubPort() (int, error) {
-	return s.getInt("subPort")
-}
-
-func (s *SettingService) SetSubPort(subPort int) error {
-	return s.setInt("subPort", subPort)
-}
-
-func (s *SettingService) GetSubPath() (string, error) {
-	subPath, err := s.getString("subPath")
-	if err != nil {
-		return "", err
-	}
-	if !strings.HasPrefix(subPath, "/") {
-		subPath = "/" + subPath
-	}
-	if !strings.HasSuffix(subPath, "/") {
-		subPath += "/"
-	}
-	return subPath, nil
-}
-
-func (s *SettingService) SetSubPath(subPath string) error {
-	if !strings.HasPrefix(subPath, "/") {
-		subPath = "/" + subPath
-	}
-	if !strings.HasSuffix(subPath, "/") {
-		subPath += "/"
-	}
-	return s.setString("subPath", subPath)
-}
-
-func (s *SettingService) GetSubDomain() (string, error) {
-	return s.getString("subDomain")
-}
-
-func (s *SettingService) GetSubCertFile() (string, error) {
-	return s.getString("subCertFile")
-}
-
-func (s *SettingService) GetSubKeyFile() (string, error) {
-	return s.getString("subKeyFile")
-}
-
-func (s *SettingService) GetSubUpdates() (int, error) {
-	return s.getInt("subUpdates")
-}
-
-func (s *SettingService) GetSubEncode() (bool, error) {
-	return s.getBool("subEncode")
-}
-
-func (s *SettingService) GetSubShowInfo() (bool, error) {
-	return s.getBool("subShowInfo")
-}
-
-func (s *SettingService) GetSubURI() (string, error) {
-	return s.getString("subURI")
-}
-
-func (s *SettingService) GetFinalSubURI(host string) (string, error) {
-	allSetting, err := s.GetAllSetting()
-	if err != nil {
-		return "", err
-	}
-	SubURI := (*allSetting)["subURI"]
-	if SubURI != "" {
-		return SubURI, nil
-	}
-	protocol := "http"
-	if (*allSetting)["subKeyFile"] != "" && (*allSetting)["subCertFile"] != "" {
-		protocol = "https"
-	}
-	if (*allSetting)["subDomain"] != "" {
-		host = (*allSetting)["subDomain"]
-	}
-	port := ":" + (*allSetting)["subPort"]
-	if (port == "80" && protocol == "http") || (port == "443" && protocol == "https") {
-		port = ""
-	}
-	return protocol + "://" + host + port + (*allSetting)["subPath"], nil
-}
-
 func (s *SettingService) Save(tx *gorm.DB, changes []model.Changes) error {
-	var err error
 	for _, change := range changes {
 		key := change.Key
-		var obj string
-		json.Unmarshal(change.Obj, &obj)
+		if _, allowed := defaultValueMap[key]; !allowed || key == "secret" {
+			continue
+		}
 
-		// Secure file existance check
-		if obj != "" && (key == "webCertFile" ||
-			key == "webKeyFile" ||
-			key == "subCertFile" ||
-			key == "subKeyFile") {
-			err = s.fileExists(obj)
-			if err != nil {
-				return common.NewError(" -> ", obj, " is not exists")
+		var value string
+		if err := json.Unmarshal(change.Obj, &value); err != nil {
+			return err
+		}
+
+		if value != "" && (key == "webCertFile" || key == "webKeyFile") {
+			if err := s.fileExists(value); err != nil {
+				return common.NewError(" -> ", value, " is not exists")
 			}
 		}
 
-		// Correct Pathes start and ends with `/`
-		if key == "webPath" ||
-			key == "subPath" {
-			if !strings.HasPrefix(obj, "/") {
-				obj = "/" + obj
+		if key == "webPath" {
+			if !strings.HasPrefix(value, "/") {
+				value = "/" + value
 			}
-			if !strings.HasSuffix(obj, "/") {
-				obj += "/"
+			if !strings.HasSuffix(value, "/") {
+				value += "/"
 			}
 		}
 
-		err = tx.Model(model.Setting{}).Where("key = ?", key).Update("value", obj).Error
-		if err != nil {
+		if err := tx.Model(model.Setting{}).Where("key = ?", key).Update("value", value).Error; err != nil {
 			return err
 		}
 	}
-	return err
-}
-
-func (s *SettingService) GetSubJsonExt() (string, error) {
-	return s.getString("subJsonExt")
+	return nil
 }
 
 func (s *SettingService) fileExists(path string) error {

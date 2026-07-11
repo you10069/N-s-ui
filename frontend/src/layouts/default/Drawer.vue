@@ -52,7 +52,6 @@ const menu = [
   { title: 'pages.home', icon: 'mdi-home', path: '/' },
   { title: 'pages.config', icon: 'mdi-code-json', path: '/config' },
   { title: 'pages.clients', icon: 'mdi-account-multiple', path: '/clients' },
-  { title: 'pages.admins', icon: 'mdi-account-tie', path: '/admins' },
   { title: 'pages.settings', icon: 'mdi-cog', path: '/settings' },
 ]
 

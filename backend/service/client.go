@@ -155,7 +155,6 @@ func (s *ClientService) SyncFromConfig() error {
 					Name:       name,
 					Config:     item.Config,
 					Inbounds:   inbounds,
-					Links:      json.RawMessage("[]"),
 					Multiplier: 1,
 					InConfig:   true,
 				}

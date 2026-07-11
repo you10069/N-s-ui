@@ -18,15 +18,12 @@
 | Multi-Client/Inbound                   | :heavy_check_mark: |
 | Advanced Traffic Routing Interface     | :heavy_check_mark: |
 | Client & Traffic & System Status       | :heavy_check_mark: |
-| Subscription Service (link/json + info)| :heavy_check_mark: |
 | Dark/Light Theme                       | :heavy_check_mark: |
 
 
 ## Default Installation Information
 - Panel Port: 2095
 - Panel Path: /app/
-- Subscription Port: 2096
-- Subscription Path: /sub/
 - User/Passowrd: admin
 
 ## Install & Upgrade to Latest Version
@@ -84,7 +81,7 @@ docker compose up -d
 ```shell
 mkdir s-ui && cd s-ui
 docker run -itd \
-    -p 2095:2095 -p 2096:2096 -p 443:443 -p 80:80 \
+    -p 2095:2095 -p 443:443 -p 80:80 \
     -v $PWD/db/:/usr/local/s-ui/db/ \
     -v $PWD/cert/:/root/cert/ \
     --name s-ui --restart=unless-stopped \
@@ -152,11 +149,7 @@ To run backend (from root folder of repository):
 ## Languages
 
 - English
-- Farsi
-- Vietnamese
 - Chinese (Simplified)
-- Chinese (Traditional)
-- Russian
 
 ## Features
 
@@ -169,8 +162,7 @@ To run backend (from root folder of repository):
 - An advanced interface for inbound and outbound configuration
 - Clients’ traffic cap and expiration date
 - Displays online clients, inbounds and outbounds with traffic statistics, and system status monitoring
-- Subscription service with ability to add external links and subscription
-- HTTPS for secure access to the web panel and subscription service (self-provided domain + SSL certificate)
+- HTTPS for secure access to the web panel (self-provided domain + SSL certificate)
 - Dark/Light theme
 
 ## Recommended OS
