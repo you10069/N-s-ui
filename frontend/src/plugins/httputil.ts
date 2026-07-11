@@ -83,6 +83,24 @@ const HttpUtils = {
     _handleMsg(msg)
     return msg
   },
+  async postJSON(url: string, data: object | null, options: any = undefined): Promise<Msg> {
+    let msg: Msg
+    try {
+        const requestOptions = {
+          ...(options ?? {}),
+          headers: {
+            ...((options && options.headers) ?? {}),
+            'Content-Type': 'application/json',
+          },
+        }
+        const resp = await api.post(url, data, requestOptions)
+        msg = _respToMsg(resp)
+    } catch (e: any) {
+        msg = { success: false, msg: e.toString(), obj: null }
+    }
+    _handleMsg(msg)
+    return msg
+  },
 }
 
 export default HttpUtils

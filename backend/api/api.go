@@ -12,21 +12,21 @@ import (
 )
 
 type configTextRequest struct {
-	Content string `json:"content" binding:"required"`
+	Content string `json:"content" form:"content" binding:"required"`
 }
 
 type clientMetadataRequest struct {
-	ID         uint    `json:"id" binding:"required"`
-	Enable     bool    `json:"enable"`
-	Volume     int64   `json:"volume"`
-	Multiplier float64 `json:"multiplier"`
-	Expiry     int64   `json:"expiry"`
-	ResetDay   int     `json:"resetDay"`
-	Desc       string  `json:"desc"`
+	ID         uint    `json:"id" form:"id" binding:"required"`
+	Enable     bool    `json:"enable" form:"enable"`
+	Volume     int64   `json:"volume" form:"volume"`
+	Multiplier float64 `json:"multiplier" form:"multiplier"`
+	Expiry     int64   `json:"expiry" form:"expiry"`
+	ResetDay   int     `json:"resetDay" form:"resetDay"`
+	Desc       string  `json:"desc" form:"desc"`
 }
 
 type clientResetRequest struct {
-	ID uint `json:"id" binding:"required"`
+	ID uint `json:"id" form:"id" binding:"required"`
 }
 
 type APIHandler struct {
@@ -114,19 +114,19 @@ func (a *APIHandler) postHandler(c *gin.Context) {
 		jsonMsg(c, "restartSb", err)
 	case "checkConfigText":
 		var request configTextRequest
-		if err = c.ShouldBindJSON(&request); err == nil {
+		if err = c.ShouldBind(&request); err == nil {
 			err = a.ConfigService.CheckRawConfig(request.Content)
 		}
 		jsonMsg(c, "check", err)
 	case "saveConfigText":
 		var request configTextRequest
-		if err = c.ShouldBindJSON(&request); err == nil {
+		if err = c.ShouldBind(&request); err == nil {
 			err = a.ConfigService.SaveRawConfig(request.Content)
 		}
 		jsonMsg(c, "save", err)
 	case "updateClient":
 		var request clientMetadataRequest
-		if err = c.ShouldBindJSON(&request); err == nil {
+		if err = c.ShouldBind(&request); err == nil {
 			err = a.ClientService.UpdateMetadata(request.ID, request.Enable, request.Volume, request.Multiplier, request.Expiry, request.ResetDay, request.Desc)
 		}
 		if err == nil {
@@ -135,7 +135,7 @@ func (a *APIHandler) postHandler(c *gin.Context) {
 		jsonMsg(c, "save", err)
 	case "resetClientTraffic":
 		var request clientResetRequest
-		if err = c.ShouldBindJSON(&request); err == nil {
+		if err = c.ShouldBind(&request); err == nil {
 			err = a.ClientService.ResetTraffic(request.ID)
 		}
 		if err == nil {
