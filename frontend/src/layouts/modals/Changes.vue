@@ -123,8 +123,6 @@ export default {
       switch (l) {
         case "zhHans":
           return "zh-cn"
-        case "zhHant":
-          return "zh-tw"
         default:
           return l
       }

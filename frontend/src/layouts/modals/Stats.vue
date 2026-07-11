@@ -126,7 +126,7 @@ export default {
       const data = await HttpUtils.get('api/stats', { resource: this.resource, tag: this.tag, limit: this.limit })
       if (data.success && data.obj) {
         const obj = <any[]>data.obj
-        const l = String(i18n.global.locale) == 'fa' ? "fa-IR" : "en-US"
+        const l = i18n.global.locale.value === 'zhHans' ? 'zh-CN' : 'en-US'
         const oneStep = this.limit * 3600 * 1000 / 360 // Each 10 sec
         const now = new Date().getTime()
         const steps = <number[]>[]

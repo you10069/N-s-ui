@@ -42,9 +42,7 @@
 <script lang="ts">
 import DatePicker from 'vue3-persian-datetime-picker'
 import { i18n } from '@/locales'
-import 'moment/locale/vi'
 import 'moment/locale/zh-cn'
-import 'moment/locale/zh-tw'
 
 export default {
   props: ['expiry'],
@@ -62,8 +60,6 @@ export default {
       switch (l) {
         case "zhHans":
           return "zh-cn"
-        case "zhHant":
-          return "zh-tw"
         default:
           return l
       }

@@ -1,30 +1,26 @@
 import { createI18n } from 'vue-i18n'
 import en from './en'
-import fa from './fa'
-import vi from './vi'
 import zhcn from './zhcn'
-import zhtw from './zhtw'
-import ru from './ru'
+
+export type AppLocale = 'en' | 'zhHans'
+
+export const normalizeLocale = (value: string | null | undefined): AppLocale =>
+  value === 'zhHans' ? 'zhHans' : 'en'
+
+const initialLocale = normalizeLocale(localStorage.getItem('locale'))
+localStorage.setItem('locale', initialLocale)
 
 export const i18n = createI18n({
   legacy: false,
-  locale: localStorage.getItem("locale") ?? 'en',
+  locale: initialLocale,
   fallbackLocale: 'en',
   messages: {
-    en: en,
-    fa: fa,
-    vi: vi,
+    en,
     zhHans: zhcn,
-    zhHant: zhtw,
-    ru: ru
   },
 })
 
 export const languages = [
-  { title: 'English', value: 'en' },
-  { title: 'فارسی', value: 'fa' },
-  { title: 'Tiếng Việt', value: 'vi' },
   { title: '简体中文', value: 'zhHans' },
-  { title: '繁體中文', value: 'zhHant' },
-  { title: 'Русский', value: 'ru' },
+  { title: 'English', value: 'en' },
 ]

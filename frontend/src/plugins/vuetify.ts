@@ -9,10 +9,11 @@ import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
 
 import colors from 'vuetify/util/colors'
-import { fa, en, vi, zhHans, zhHant, ru } from 'vuetify/locale'
+import { en, zhHans } from 'vuetify/locale'
 
 // Composables
 import { createVuetify } from 'vuetify'
+import { normalizeLocale } from '@/locales'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
@@ -51,8 +52,8 @@ export default createVuetify({
     },
   },
   locale: {
-    locale: localStorage.getItem("locale") ?? 'en',
+    locale: normalizeLocale(localStorage.getItem('locale')),
     fallback: 'en',
-    messages: { en, fa, vi, zhHans, zhHant, ru },
+    messages: { en, zhHans },
   },
 })

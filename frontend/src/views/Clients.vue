@@ -107,12 +107,28 @@
         </template>
 
         <template #item.actions="{ item }">
-          <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEditor(item)">
-            <v-tooltip activator="parent" location="top">{{ $t('actions.edit') }}</v-tooltip>
-          </v-btn>
-          <v-btn icon="mdi-restore" size="small" variant="text" color="warning" @click="resetTraffic(item)">
-            <v-tooltip activator="parent" location="top">{{ $t('client.resetTraffic') }}</v-tooltip>
-          </v-btn>
+          <div class="client-actions">
+            <v-btn
+              icon="mdi-pencil"
+              size="small"
+              variant="tonal"
+              color="primary"
+              class="client-action-btn"
+              @click="openEditor(item)"
+            >
+              <v-tooltip activator="parent" location="top">{{ $t('actions.edit') }}</v-tooltip>
+            </v-btn>
+            <v-btn
+              icon="mdi-restore"
+              size="small"
+              variant="tonal"
+              color="warning"
+              class="client-action-btn"
+              @click="resetTraffic(item)"
+            >
+              <v-tooltip activator="parent" location="top">{{ $t('client.resetTraffic') }}</v-tooltip>
+            </v-btn>
+          </div>
         </template>
       </v-data-table>
     </v-card>
@@ -270,7 +286,7 @@ const headers = computed(() => [
   { title: i18n.global.t('client.trafficQuota'), key: 'quota', sortable: false, width: 190 },
   { title: i18n.global.t('date.expiry'), key: 'expiry' },
   { title: i18n.global.t('client.resetDay'), key: 'resetDay' },
-  { title: i18n.global.t('actions.action'), key: 'actions', sortable: false },
+  { title: i18n.global.t('actions.action'), key: 'actions', sortable: false, align: 'center' as const, width: 104 },
 ])
 
 const resetDays = computed(() => [
@@ -410,5 +426,26 @@ onBeforeUnmount(() => {
 <style scoped>
 .users-page {
   max-width: 1900px;
+}
+
+.client-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 88px;
+}
+
+.client-action-btn {
+  width: 34px;
+  height: 34px;
+  border: 1px solid currentColor;
+  opacity: 1;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 18%);
+}
+
+.client-action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgb(0 0 0 / 24%);
 }
 </style>

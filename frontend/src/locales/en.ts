@@ -216,7 +216,7 @@ export default {
     offline: "Offline",
     multiplier: "Multiplier",
     adjustedTraffic: "Adjusted traffic",
-    totalTraffic: "Total traffic",
+    totalTraffic: "Used traffic",
     resetDay: "Monthly reset",
     monthlyDay: "Day {day} of each month",
     resetTraffic: "Reset traffic",

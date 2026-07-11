@@ -216,7 +216,7 @@ export default {
     offline: "离线",
     multiplier: "倍率",
     adjustedTraffic: "倍率后流量",
-    totalTraffic: "总流量",
+    totalTraffic: "已用流量",
     resetDay: "每月重置",
     monthlyDay: "每月 {day} 号",
     resetTraffic: "手动重置流量",
