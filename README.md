@@ -1,4 +1,4 @@
-# N-S-UI
+# S-UI
 **An Advanced Web Panel • Built on SagerNet/Sing-Box**
 
 ![](https://img.shields.io/github/v/release/alireza0/s-ui.svg)
