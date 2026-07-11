@@ -89,15 +89,20 @@
                         </v-tooltip>
                         IPv6
                       </v-chip>
-                      <v-switch
-                        v-model="showSystemIp"
-                        class="ip-visibility-switch"
+                      <v-btn
+                        class="ip-visibility-toggle"
+                        :icon="showSystemIp ? 'mdi-eye' : 'mdi-eye-outline'"
+                        :variant="showSystemIp ? 'tonal' : 'text'"
                         color="primary"
                         density="compact"
-                        hide-details
-                        inset
-                        :label="$t('main.info.showIp')"
-                      ></v-switch>
+                        size="x-small"
+                        :aria-label="$t('main.info.showIp')"
+                        @click="showSystemIp = !showSystemIp"
+                      >
+                        <v-tooltip activator="parent" location="top">
+                          {{ $t('main.info.showIp') }}
+                        </v-tooltip>
+                      </v-btn>
                     </div>
                     <v-expand-transition>
                       <div v-if="showSystemIp" class="ip-address-list mt-2" dir="ltr">
@@ -304,9 +309,12 @@ const restartSingbox = async () => {
 </script>
 
 <style scoped>
-.ip-visibility-switch {
+.ip-visibility-toggle {
   flex: 0 0 auto;
-  min-width: 118px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  margin-inline-start: 2px;
 }
 
 .ip-address-list {
